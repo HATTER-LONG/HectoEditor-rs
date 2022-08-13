@@ -17,17 +17,23 @@ fn main() {
     let _stdout = stdout().into_raw_mode().unwrap();
 
     for b in io::stdin().bytes() {
-        let b = b.unwrap();
-        let c = b as char;
-        // \r (Carriage Return) at the end of each line,
-        // make sure our output is neatly printed line by line without indentation.
-        if c.is_control() {
-            println!("{:?} \r", b);
-        } else {
-            println!("{:?} ({})\r", b, c);
-        }
-        if b == to_ctrl_byte('q') {
-            break;
+        // use match to catch error arms and deal it by die func to clean screen
+        match b {
+            Ok(b) => {
+                let c = b as char;
+
+                if c.is_control() {
+                    println!("{:?} \r", b);
+                } else {
+                    println!("{:?} ({})\r", b, c);
+                }
+                // \r (Carriage Return) at the end of each line,
+                // make sure our output is neatly printed line by line without indentation.
+                if b == to_ctrl_byte('q') {
+                    break;
+                }
+            }
+            Err(err) => die(err),
         }
     }
 }
